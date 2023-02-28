@@ -76,13 +76,19 @@ app.get("/mint", async (req, res) => {
       console.log("option",options)
       const tx = await contract.mintToken(customer_eth, "ipfs://" + metadata_hash, options)
       console.log("tx", tx)
-      let res = await tx.wait()
-      if (res.transactionHash) {
-        console.log("ok");
+      let txRes = await tx.wait()
+      if (txRes.transactionHash) {
+        let totalSupply = await contract.totalSupply();
+        res.send({ 
+          tokenId: parseInt(totalSupply),
+          status: "minted" 
+        })
       }
-    } catch (err) {
-      // setMintStatus("Public Mint failed! Please check your wallet.")
-    }
+  } catch (err) {
+    res.send({
+      status: "failed"
+    })
+  }
   /////////////////////////////////////////////////////////////////////////////
 });
 
